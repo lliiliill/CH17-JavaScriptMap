@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/MarkerCluster.css">
+      <link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style type="text/css">
+    	/*.marker-cluster-small{	
+    		background-color: #F01F1F;
+    	}*/
+    	.marker-cluster-small div{		
+    		font-size:30px;
+    		color:#F13434;
+    		font-weight: bolder;
+    		background-color: rgba(216,243,57,0.6);
+    	}
+    	.marker-cluster-medium div {
+	 		
+    		font-size:30px;
+    		color:#2E4AF0;
+    		font-weight: bolder;
+    		background-color: rgba(163,207,250,0.6);	
+    	}      	
+
+    	.marker-cluster-large div{
+    		font-size:30px;
+    		color:#9EF9EF;
+    		font-weight: bolder;
+    		background-color: rgba(245,30,30,0.6);
+    	}      	    	    	
+    	.marker-cluster div{
+    		width: 50px;
+    		height: 50px;
+    		/*margin-left:5px;*/
+    		/*margin-top:5px;*/
+    		text-align: center;
+    		border-radius: 25px;
+    	}
+    	.marker-cluster span{
+    		line-height: 30px	
+    	}
+		.loadingimg{
+			height: 100px;
+			width: 100px;
+		  animation:rotate-taichi 2s ease-in infinite alternate;
+		}
+		 
+		@keyframes rotate-taichi {
+		  0%{transform:rotate(0deg);}
+		  100%{transform:rotate(720deg);}
+		}
+		.mask_style{
+			display : inline;
+		}
+    	.bg-cover{
+    		background-position: center center;
+    		background-size: cover;
+    		background-repeat: no-repeat;
+    	}			
+
+    </style>
+    <title>Hello, world!</title>
+  </head>
+  <body>
+  	<!-- container-fluid 滿版-->
+  	<div class="container-fluid">
+	  	<div class="row" style="height: 100vh">
+	  		<div class="col-md-3 bg-warning">
+	  			<div class="row mt-3 ">
+		  			<div class=" col-md-2 ">
+		  				<label for=""class="mt-1 font-weight-bold">縣市</label>
+		  				<label for=""class="mt-4 font-weight-bold">鄉鎮</label>
+		  			</div>
+					<div class=" col-md-10 ">
+						<select class="custom-select mt-1"id="city" >
+						  <option selected>-縣市-</option>
+						</select>
+
+						<select class="custom-select mt-3 "id="town">
+						  <option selected>-鄉鎮-</option>
+						</select>						
+					</div>	
+					<div class="col-md-12"><div id="loading"class="mt-4 ">
+						<img src="img/小磁怪-removebg-preview.png" class="loadingimg">
+						<h3 style="display : inline;">讀取中,請稍待片刻!</h3></div></div>
+
+					<div class="col-md-2 mt-3">
+						<label for=""class="mt-1 font-weight-bold">顯示數</label>							
+					</div>
+					<div class="col-md-4 mt-3">
+						<div class="form-group">
+							<input type="number" class="form-control"id="mask_story_max"placeholder="顯示數量" min="1" value="1">
+						</div>								
+					</div>
+					<div class="col-md-6 mt-3">
+						<div class="btn btn-danger" id="distance_btn">顯示最近的藥局(使用者)</div>								
+					</div>
+					<div class="col-md-1 mt-1"><img src="img/marker-icon-green.png"></div>
+					<div class="col-md-3 mt-1">口罩>1800</div>
+					<div class="col-md-1 mt-1"><img src="img/marker-icon-yellow.png"></div>
+					<div class="col-md-3 mt-1">口罩<1800</div>
+					<div class="col-md-1 mt-1"><img src="img/marker-icon-red.png"></div>
+					<div class="col-md-3 mt-1">口罩量=0</div>
+					<img src="img/Pikachu.jpg" alt="" class="mt-5" style="width: 100%" id="pikachu_img">																
+										
+		  			<ul class="list-group region_list w-100 mx-2 mt-2 " style="height: 80vh;overflow: auto;"id="mask_list">  				
+		  			</ul>					  	  				
+	  			</div>
+			
+	  		</div>
+	  		<div class="col-md-9 bg-info" >
+	  			 <div id="map" class="bg-cover" style="height: 100vh ;background-image: url(img/HxH.jpg);" ></div> 
+	  		</div>  		
+	  	</div>  		
+  	</div>
+
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <script src="js/CityCountyData.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="js/leaflet.markercluster.js"></script>
+    <script src="js/leaflet-color-markers.js"></script>
+
+    <script>
+    	var maskdata;//記錄所有mask的資料~
+    	var town;
+    	var cityname;
+    	var map;
+    	var myLocation=0;
+    	var curLat=0;//我的位置
+    	var curLng=0;//我的位置
+    	var markers;
+    	var mask_less=1800; //口罩很少
+    	$('#city').prop('disabled', true);
+    	$('#town').prop('disabled', true);
+    	$(function(){
+    		//初始化地圖OSM	
+				//-----下方上課座標取法----	 		
+ 		        // navigator.geolocation.getCurrentPosition(showPosition);	
+ 		        //---------------------   		
+		        map = L.map('map').setView([24.1694994,120.5533185], 13);
+		        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		        }).addTo(map);
+		        markers= new L.markerClusterGroup().addTo(map);
+ 				// ----setView 可以設定地圖座標-------
+				// ----watch 則是持續監聽使用者的位置-------
+				map.locate({setView: true, watch: false});  
+				// 成功監聽到使用者的位置時觸發
+				map.on('locationfound', onLocationFound);
+
+				// // 失敗時觸發
+				// map.on('locationerror', onLocationError);	
+				//------------------以上是另一種座標取法	
+
+    		//載入第三方健保局口罩資料
+    		$.ajax({
+    			type:"GET",
+    			url:"https://raw.githubusercontent.com/kiang/pharmacies/master/json/points.json",
+    			dataType:"json",
+    			success:function(data){
+    				maskdata=data.features;
+    				$('#city').prop('disabled', false);
+    				$('#town').prop('disabled', false); 
+    				$('#loading').hide();
+    				$("#mask_story_max").prop("max",maskdata.length); //使用者可以選擇顯示的藥局數量上限=所取得的開放資料數   				
+    				console.log(maskdata);
+    			},
+    			error:function(){
+    				alert("error maskopendata");
+    			}
+    		});
+    		//---------------
+		   city.forEach(function(item){
+		   	// console.log(item.CityName);
+		   var cityhtml='<option value="'+item.CityName+'">'+item.CityName+'</option>';
+		   	$("#city").append(cityhtml);
+		   });	
+		   //監聽縣市轉鄉鎮
+			$('#city').on('change', function(e){
+				// console.log($(this).val());
+				$("#town").empty();
+				$("#town").append("<option selected>-鄉鎮-</option>");				
+				 cityname=$(this).val();
+				 city.forEach(function(item){
+				 		if(item.CityName==cityname){
+				 			// console.log(item.AreaList);
+				 			item.AreaList.forEach(function(item2){
+						   var cityhtml='<option value="'+item2.AreaName+'">'+item2.AreaName+'</option>';
+						   	$("#town").append(cityhtml);					 				
+						   });	
+				 		}
+				 	 });														
+			});
+ 			//鄉鎮Select監聽
+			$('#town').on('change', function(e){	
+
+				// console.log($(this).val());
+				var region_mask=[];//紀錄該區的口罩資料
+				 town=$(this).val();
+				 maskdata.forEach(function(item){
+				 	if(item.properties.county==cityname&&item.properties.town==town){
+				 		region_mask.push(item);
+				 	}
+				 });
+
+				 console.log(region_mask);
+				 $("#mask_list").empty();
+				 	removeMarker();//清空marker的歷史紀錄
+				 	// var i=0;
+				 	show_masklist(region_mask);
+				 
+			});	   
+			//--------------------------------------------------------------------	
+			$("#distance_btn").bind("click",function(){ //顯示最近口罩藥局的方法	
+				
+				var mask_find_max=$("#mask_story_max").val();//使用者所選擇的藥局顯示數
+				var mask_range_data=[];
+				if(mask_find_max>maskdata.length){
+					alert("沒有這麼多資料可以顯示，故顯示全部資料");
+					mask_find_max=maskdata.length;
+				}
+
+
+				if(myLocation!=0){
+	 				removeMarker ();	 				
+				     L.marker([curLat,curLng],{icon:blackIcon}).addTo(map)//建立marker
+					             .bindPopup("<h3>我的位置</h3>")
+			         	 .openPopup(); 
+
+					var distance=[];//各藥局與使用者所在位置的距離
+					//將各個藥局的相對距離存入陣列
+					 maskdata.forEach(function(item){
+		　			var maskstore = L.latLng(item.geometry.coordinates[1],item.geometry.coordinates[0]); // 指定位置
+						distance.push(myLocation.distanceTo(maskstore));
+		  			// console.log(myLocation.distanceTo(maskstore)); // 計算使用者和藥局的距離				 	
+					 });
+					 //比較大小的演算法(選擇排序)
+			        var len = maskdata.length;
+			        var minIndex;
+			        var distance_temp;
+			        var maskdata_temp;
+			        for (var i = 0; i < len - 1; i++) {
+			            minIndex = i;
+			            for (var j = i + 1; j < len; j++) {
+			                if (distance[j] < distance[minIndex]) {     // 尋找最小的數
+			                    minIndex = j;                 // 將最小數的索引儲存
+			                }
+			            }
+			            distance_temp = distance[i];
+			            maskdata_temp = maskdata[i];
+			            distance[i] = distance[minIndex];
+			            maskdata[i] = maskdata[minIndex];
+			            distance[minIndex] = distance_temp;
+			            maskdata[minIndex] = maskdata_temp
+			        }
+			        for(var i=0;i<mask_find_max;i++){
+			        	mask_range_data.push(maskdata[i]);//寫入特定條件的資料
+					 	// var popupHtml='<div class="card" style="width: 18rem;">'+
+	  				// 				'<div class="card-header">'+maskdata[i].properties.name+'</div>'+
+							// 	  	'<ul class="list-group list-group-flush">'+
+							// 	   	'<li class="list-group-item">'+maskdata[i].properties.address+'</li>'+
+							// 	    '<li class="list-group-item">'+maskdata[i].properties.phone+'</li>'+
+							// 	    '<li class="list-group-item text-info">成人口罩:'+maskdata[i].properties.mask_adult+
+							// 	    '  兒童口罩:'+maskdata[i].properties.mask_child+'</li></ul></div>';
+
+			    //         markers.addLayer(L.marker([maskdata[i].geometry.coordinates[1], //加入marker
+			    //         							maskdata[i].geometry.coordinates[0]],{icon:violetIcon}).bindPopup(popupHtml));
+				  //    map.panTo([curLat,curLng]);
+				  //    L.marker([curLat,curLng],{icon:blackIcon}).addTo(map)//建立marker
+					 // .bindPopup("<h3>我的位置</h3>")		        	
+			        }
+
+ 					$("#mask_list").empty();
+			        show_masklist(mask_range_data);
+			        //調整遠近
+      			  		 map.setZoom(13);	
+      			   	//--- 			        
+			        map.panTo([curLat,curLng]);			        
+			        // console.log(distance);
+			        //  console.log(maskdata);					
+				}
+				else{
+					alert("無法取得GPS,請給予權限");
+					map.locate({setView: true, watch: false});  
+				}
+			});		        
+    	});
+
+		       
+
+			//副程式----------------------------------
+			function removeMarker (){ //
+				map.eachLayer(function(layer){ //標準清除
+					if(layer instanceof L.Marker){
+						map.removeLayer(layer);
+					}
+				});
+				markers.eachLayer(function(layer){//記憶體減輕的mvaker清除
+					if(layer instanceof L.Marker){
+						markers.removeLayer(layer);
+					}
+				});
+			}
+			function show_masklist(region_mask){//渲染藥局的List
+				$("#pikachu_img").hide();
+	    		var week=new Date().getDay();//取得現在星期幾
+
+				region_mask.forEach(function(item,key){  //渲染list的內容
+					//取得營業時間的數據(透過字串切割)
+					var available=[];
+					available=(item.properties.available.split("、"));
+					var avaing=[];
+					available.forEach(function(item){
+						console.log(item);
+								if(item.includes("看診")){
+									console.log("OK1");
+									avaing.push("◎");
+								}
+								else{
+									console.log("不OK1");
+									avaing.push("X");
+								}
+					 });
+					console.log(avaing);
+					 // console.log(available);
+					var str_Mask_adult_Qua;//大人口罩的顯示文字
+					var str_Mask_adult_Qua2;//大人口罩的顯示文字(popup)
+					var str_Mask_child_Qua;//小孩口罩的顯示文字
+					var str_Mask_adult_Qua2;//小孩口罩的顯示文字(popup)
+					//大人
+					if(item.properties.mask_adult==0){
+ 						str_Mask_adult_Qua='<p class="text-danger">'+item.properties.mask_adult+'</p>';
+  						str_Mask_adult_Qua2='<p class="mask_style font-weight-bold">'+
+ 										'成人口罩:</p><p class="text-danger mask_style">'+item.properties.mask_adult+'</p>';						
+					}
+
+					else if(item.properties.mask_adult<mask_less){
+						str_Mask_adult_Qua='<p class="text-warning">'+item.properties.mask_adult+'</p>';
+  						str_Mask_adult_Qua2='<p class="mask_style font-weight-bold">'+
+ 										'成人口罩:</p><p class="text-warning mask_style">'+item.properties.mask_adult+'</p>';							
+					}
+ 					else{
+ 						str_Mask_adult_Qua='<p class="text-success">'+item.properties.mask_adult+'</p>';
+  						str_Mask_adult_Qua2='<p class="mask_style font-weight-bold">'+
+ 										'成人口罩:</p><p class="text-success mask_style">'+item.properties.mask_adult+'</p>';	 						
+ 					} 
+ 						
+
+ 					//小孩
+					if(item.properties.mask_child==0){
+ 						str_Mask_child_Qua='<p class="text-danger">'+item.properties.mask_child+'</p>';
+						str_Mask_child_Qua2='<p class="mask_style font-weight-bold">'+
+										'兒童口罩:</p><p class="text-danger mask_style">'+item.properties.mask_child+'</p>';	 						
+					}
+					else if(item.properties.mask_child<mask_less){
+						str_Mask_child_Qua='<p class="text-warning">'+item.properties.mask_child+'</p>';
+						str_Mask_child_Qua2='<p class="mask_style font-weight-bold">'+
+										'兒童口罩:</p><p class="text-warning mask_style">'+item.properties.mask_child+'</p>';						
+					}
+
+ 					else{ 						
+ 						str_Mask_child_Qua='<p class="text-success">'+item.properties.mask_child+'</p>';
+						str_Mask_child_Qua2='<p class="mask_style font-weight-bold">'+
+										'兒童口罩:</p><p class="text-success mask_style">'+item.properties.mask_child+'</p>';	 						
+ 					} 
+
+
+
+				 	$("#mask_list").append(		  				
+				 		'<li class="list-group-item" data-name='+item.properties.name+
+				 		' data-address='+item.properties.address+' data-phone='+item.properties.phone+
+				 		' data-mask_adult='+item.properties.mask_adult+' data-mask_child='+item.properties.mask_child+
+				 		' data-lat='+item.geometry.coordinates[1]+' data-lng='+item.geometry.coordinates[0]+'>'+
+		  					'<h3 class="font-weight-bold">'+item.properties.name+'</h3>'+
+		  					'<h5 class="font-weight-bold">地址:</h5><p>'+item.properties.address+'</p>'+
+		  					'<h5 class="font-weight-bold">電話:</h5><p>'+item.properties.phone+'</p>'+
+		  					'<h5 class="font-weight-bold">成人口罩:</h5>'+str_Mask_adult_Qua+
+		  						'<h5 class="font-weight-bold">兒童口罩:</h5>'+str_Mask_child_Qua+
+		  					'<h5 class="font-weight-bold">藥局營業時間(詳細時間請依藥局規定)</h5>'+
+		  					'<table class="table table-sm table-dark">'+
+		  					'<thead class="text-center">'+
+		  					'<tr id="trr">'+
+		  					'<td class="table-active">#</td><td class="table-active" id="w1">周一</td>'+
+		  					'<td class="table-active" id="w2">周二</td>'+
+		  					'<td class="table-active" id="w3">周三</td><td class="table-active" id="w4">周四</td><td class="table-active"id="w5">周五</td>'+
+		  					'<td class="table-active" id="w6">周六</td><td class="table-active" id="w7">周日</td></tr>'+
+		  					'</thead><tbody class="text-center">'+
+		  					'<tr><th scope="row">上午</th><td>'+avaing[0]+'</td><td>'+avaing[1]+'</td><td>'+avaing[2]+'</td><td>'+
+		  					avaing[3]+'</td><td>'+avaing[4]+'</td><td>'+avaing[5]+'</td><td>'+avaing[6]+'</td></tr>'+
+		  					'<tr><th scope="row">下午</th><td>'+avaing[7]+'</td><td>'+avaing[8]+'</td><td>'+avaing[9]+'</td><td>'+
+		  					avaing[10]+'</td><td>'+avaing[11]+'</td><td>'+avaing[12]+'</td><td>'+avaing[13]+'</td></tr>'+
+		  					'<tr><th scope="row">晚上</th><td>'+avaing[14]+'</td><td>'+avaing[15]+'</td><td>'+avaing[16]+'</td><td>'+avaing[17]+'</td><td>'+avaing[18]+'</td><td>'+avaing[19]+'</td><td>'+avaing[20]+'</td></tr>'+'</tbody></table></li>');
+				 			//上面應該可以用巨集
+ 					switch(week){
+ 						case 1:
+ 							$("#trr #w1").removeClass("table-active");
+ 							$("#trr #w1").addClass("table-info text-dark");
+ 							break;
+ 						case 2:
+  							$("#trr #w2").removeClass("table-active");
+ 							$("#trr #w2").addClass("table-info text-dark");						
+ 							break;
+ 						case 3:
+ 							$("#trr #w3").removeClass("table-active");
+ 							$("#trr #w3").addClass("table-info text-dark");
+ 							break;
+  						case 4:
+ 							$("#trr #w4").removeClass("table-active");
+ 							$("#trr #w4").addClass("table-info text-dark");  						
+ 							break;
+ 						case 5:
+ 							$("#trr #w5").removeClass("table-active");
+ 							$("#trr #w5").addClass("table-info text-dark");						
+ 							break;
+  						case 6:
+  							$("#trr #w6").removeClass("table-active");
+ 							$("#trr #w6").addClass("table-info text-dark"); 						
+ 							break;
+ 						case 7:
+  							$("#trr #w7").removeClass("table-active");
+ 							$("#trr #w7").addClass("table-info text-dark");						
+ 							break; 						 						
+ 					}				 			
+				 	var popupHtml='<div class="card" style="width: 18rem;">'+
+  								'<div class="card-header font-weight-bold">'+item.properties.name+'</div>'+
+							  	'<ul class="list-group list-group-flush">'+
+							   	'<li class="list-group-item">'+item.properties.address+'</li>'+
+							    '<li class="list-group-item">'+item.properties.phone+'</li>'+
+							    '<li class="list-group-item text-info">'+str_Mask_adult_Qua2+
+							    str_Mask_child_Qua2+'</li></ul></div>';
+ 					//大人
+					if(item.properties.mask_adult==0){
+		            markers.addLayer(L.marker([item.geometry.coordinates[1], //加入marker
+		            							item.geometry.coordinates[0]],{icon:redIcon}).bindPopup(popupHtml));					
+					}
+
+					else if(item.properties.mask_adult<mask_less){
+		            markers.addLayer(L.marker([item.geometry.coordinates[1], //加入marker
+		            							item.geometry.coordinates[0]],{icon:goldIcon}).bindPopup(popupHtml));						
+					}
+ 					else{
+ 		            markers.addLayer(L.marker([item.geometry.coordinates[1], //加入marker
+		            							item.geometry.coordinates[0]],{icon:greenIcon}).bindPopup(popupHtml));					 						
+ 					}
+    				 if(key==Math.round(region_mask.length/2)){//panTo資料數中心 e.g.10筆的第五筆
+    				 	map.panTo([item.geometry.coordinates[1], item.geometry.coordinates[0]]);
+    				 }	 					 	            					
+				 });
+
+				 		    $("#mask_list .list-group-item").click(function(){ //口罩資訊的listview 點擊監聽
+				 		    	//設定點擊效果
+				 		     $("#mask_list .list-group-item").removeClass("bg-secondary");
+				 		     $(this).addClass("bg-secondary");
+				 		     //-----
+				 		     	//呼叫建立popup的方法
+				 		    	markerPopup($(this).data("name"),$(this).data("address"),$(this).data("phone"),$(this).data("mask_adult"),$(this).data("mask_child"),$(this).data("lat"),$(this).data("lng"));
+		            		});				
+
+			}
+			function markerPopup(name,address,phone,mask_adult,mask_child,lat,lng){//建立popup的方法
+					var str_Mask_adult_Qua;//大人口罩的顯示文字
+					var str_Mask_child_Qua;//小孩口罩的顯示文字
+					//大人
+					if(mask_adult==0){
+ 						str_Mask_adult_Qua='<p class="mask_style font-weight-bold">'+
+ 										'成人口罩:</p><p class="text-danger mask_style">'+mask_adult+'</p>';
+					}
+					else if(mask_adult<mask_less){
+						str_Mask_adult_Qua='<p class="mask_style font-weight-bold">'+
+										'成人口罩:</p><p class="text-warning mask_style">'+mask_adult+'</p>';
+					}
+ 					else {
+ 						str_Mask_adult_Qua='<p class="mask_style font-weight-bold">'+
+ 											'成人口罩:</p><p class="text-success mask_style">'+mask_adult+'</p>';
+ 					}
+ 					//小孩
+					if(mask_child==0){
+ 						str_Mask_child_Qua='<p class="mask_style font-weight-bold">'+
+ 										'兒童口罩:</p><p class="text-danger mask_style">'+mask_child+'</p>';
+					}
+					else if(mask_child<mask_less){
+						str_Mask_child_Qua='<p class="mask_style font-weight-bold">'+
+										'兒童口罩:</p><p class="text-warning mask_style">'+mask_child+'</p>';
+					}
+ 					else {
+ 						str_Mask_child_Qua='<p class="mask_style font-weight-bold">'+
+ 											'兒童口罩:</p><p class="text-success mask_style">'+mask_child+'</p>';
+ 					}
+
+
+				var strHtml='<div class="card" style="width: 18rem;">'+
+  								'<div class="card-header font-weight-bold">'+name+'</div>'+
+							  	'<ul class="list-group list-group-flush">'+
+							   	'<li class="list-group-item">'+address+'</li>'+
+							    '<li class="list-group-item">'+phone+'</li>'+
+							    '<li class="list-group-item text-info">'+str_Mask_adult_Qua+
+							    str_Mask_child_Qua+'</li></ul></div>';
+				//產生指定位置的popup 配合偏移
+				 L.popup({
+				        offset: [0, -30]
+				    })
+				      .setLatLng([lat,lng])
+				      .setContent(strHtml)
+      			.openOn(map);
+
+      			//調整遠近及畫面位置
+      			   map.setZoom(15);	
+      			   map.panTo([lat,lng]); 
+      			   //--- 
+
+		        // L.marker([lat,lng]).addTo(map)
+		        //     .bindPopup(strHtml)
+		        // .openPopup();							    
+			}
+
+			 //------------上課用座標方法---
+			// function showPosition(position) {
+			//   curLat= position.coords.latitude;
+			//   curLng=position.coords.longitude;	
+			//   			  console.log(curLat+","+curLat);
+			//     map.panTo([curLat,curLng]);
+			//    L.marker([curLat,curLng],{icon:blackIcon}).addTo(map)//建立marker
+		 //            .bindPopup("<h1>我的位置</h1>")
+		 //        .openPopup();
+		 //     }		     			
+ 			//------------------
+ 			//--另一種座標方法(成功獲取座標)
+	function onLocationFound(e) {
+	   myLocation = e.latlng // 使用者位置
+	 	curLat= myLocation["lat"];
+	 	curLng= myLocation["lng"];
+	 	 console.log(curLng);
+	     map.panTo([curLat,curLng]);
+	     L.marker([curLat,curLng],{icon:blackIcon}).addTo(map)//建立marker
+		             .bindPopup("<h3>我的位置</h3>")
+		         .openPopup();
+
+	}  	
+    </script>
+
+  </body>
+</html>

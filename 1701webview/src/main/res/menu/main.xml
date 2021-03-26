@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@android:drawable/ic_dialog_dialer"
+        android:title="選擇"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/mask"
+                android:title="口罩地圖" />
+            <item
+                android:id="@+id/rock"
+                android:title="小石" />
+            <item
+                android:id="@+id/action_settings"
+                android:icon="@android:drawable/ic_delete"
+                android:orderInCategory="9999"
+                android:title="@string/action_settings" />
+        </menu>
+    </item>
+</menu>
